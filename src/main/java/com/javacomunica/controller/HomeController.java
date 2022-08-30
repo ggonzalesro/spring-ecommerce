@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.text.html.parser.DTD;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,7 @@ public class HomeController {
 	}
 	
 	@PostMapping("/cart")
-	public String addCart(@RequestParam Integer id,@RequestParam Integer cantidad) {
+	public String addCart(@RequestParam Integer id,@RequestParam Integer cantidad,Model model) {
 		
 		DetalleOrden detalleOrden=new DetalleOrden();
 		Producto producto = new Producto();
@@ -70,6 +72,23 @@ public class HomeController {
 		
 		log.info("producto añadido: {}",produOptional.get());
 		log.info("cantidad añadida: {}",cantidad);
+		
+		producto = produOptional.get();
+		
+		detalleOrden.setCantidad(cantidad);
+		detalleOrden.setPrecio(producto.getPrecio());
+		detalleOrden.setNombre(producto.getNombre());
+		detalleOrden.setTotal(producto.getPrecio()*cantidad);
+		detalleOrden.setProducto(producto);
+		
+		detalles.add(detalleOrden);
+		
+		sumaTotal=detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
+		
+		orden.setTotal(sumaTotal);
+		
+		model.addAttribute("cart",detalles);
+		model.addAttribute("orden", orden);
 		
 		return "usuario/carrito";
 	}
