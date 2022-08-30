@@ -1,5 +1,7 @@
 package com.javacomunica.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.javacomunica.model.DetalleOrden;
+import com.javacomunica.model.Orden;
 import com.javacomunica.model.Producto;
 import com.javacomunica.service.ProductoService;
 
@@ -23,6 +28,12 @@ public class HomeController {
 	
 	@Autowired
 	private ProductoService productoService;
+	
+	//esto sirve para almacenar 1 o más detalles de la ORDEN
+	List<DetalleOrden> detalles=new ArrayList<DetalleOrden>();
+
+	//almacena los datos de la ORDEN
+	Orden orden = new Orden();
 	
 	@GetMapping("")
 	public String home(Model model) {
@@ -49,7 +60,16 @@ public class HomeController {
 	}
 	
 	@PostMapping("/cart")
-	public String addCart() {
+	public String addCart(@RequestParam Integer id,@RequestParam Integer cantidad) {
+		
+		DetalleOrden detalleOrden=new DetalleOrden();
+		Producto producto = new Producto();
+		double sumaTotal=0;
+		
+		Optional<Producto> produOptional=productoService.get(id);
+		
+		log.info("producto añadido: {}",produOptional.get());
+		log.info("cantidad añadida: {}",cantidad);
 		
 		return "usuario/carrito";
 	}
