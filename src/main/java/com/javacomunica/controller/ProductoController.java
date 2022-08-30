@@ -48,24 +48,19 @@ public class ProductoController {
 		LOGGER.info("Este es el objeto {}",producto);
 		Usuario usuario = new Usuario(1, "", "", "", "", "", "", "");
 		producto.setUsuario(usuario);
+		//image
+				if (producto.getId()==null) {
+					String nameImage=uploadFileService.saveImage(file);
+					producto.setImagen(nameImage);
+					System.out.println(producto);
+					LOGGER.info("Este es el objetoooooooo {}",producto);
+				}else {
+					
+				}
+		
 		productoService.save(producto);
 		
-		//image
-		if (producto.getId()==null) {
-			String nameImage=uploadFileService.saveImage(file);
-			producto.setImagen(nameImage);
-		}else {
-			if (file.isEmpty()) {
-				Producto p=new Producto();
-				p=productoService.get(producto.getId()).get();
-				
-				producto.setImagen(p.getImagen());
-				
-			}else {
-				String nameImage=uploadFileService.saveImage(file);
-				producto.setImagen(nameImage);
-			}
-		}
+		
 		
 		return "redirect:/productos";
 	}
@@ -84,13 +79,37 @@ public class ProductoController {
 	}
 	
 	@PostMapping("/update")
-	public String update(Producto producto) {
+	public String update(Producto producto,@RequestParam("img") MultipartFile file) throws IOException {
+		
+		Producto p=new Producto();
+		p=productoService.get(producto.getId()).get();
+		
+		if (file.isEmpty()) {
+			producto.setImagen(p.getImagen());
+		}else {
+			if (!p.getImagen().equals("default.jpg")) {
+				uploadFileService.deleteImage(p.getImagen());
+			}
+			
+			String nameImage=uploadFileService.saveImage(file);
+			producto.setImagen(nameImage);
+		}
+		
+		producto.setUsuario(p.getUsuario());
 		productoService.update(producto);
 		return "redirect:/productos";
 	}
 	
 	@GetMapping("/delete/{id}")
 	public String delete(@PathVariable Integer id) {
+		
+		Producto producto=new Producto();
+		producto=productoService.get(id).get();
+		
+		if (!producto.getImagen().equals("default.jpg")) {
+			uploadFileService.deleteImage(producto.getImagen());
+		}
+		
 		productoService.delete(id);
 		return "redirect:/productos";
 	}
