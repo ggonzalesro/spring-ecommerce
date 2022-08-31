@@ -126,7 +126,7 @@ public class HomeController {
 
 		return "usuario/carrito";
 	}
-	
+
 	@GetMapping("/getCart")
 	public String getCart(Model model) {
 		model.addAttribute("cart", detalles);
@@ -134,4 +134,9 @@ public class HomeController {
 		return "/usuario/carrito";
 	}
 	
+	@GetMapping("/order")
+	public String order() {
+		return "/usuario/resumenorden";
+	}
+
 }
