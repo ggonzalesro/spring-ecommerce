@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.javacomunica.model.DetalleOrden;
 import com.javacomunica.model.Orden;
 import com.javacomunica.model.Producto;
+import com.javacomunica.model.Usuario;
 import com.javacomunica.service.ProductoService;
+import com.javacomunica.service.UsuarioService;
 
 @Controller
 @RequestMapping("/")
@@ -30,6 +32,9 @@ public class HomeController {
 
 	@Autowired
 	private ProductoService productoService;
+	
+	@Autowired
+	private UsuarioService usuarioService;
 
 	// esto sirve para almacenar 1 o más detalles de la ORDEN
 	List<DetalleOrden> detalles = new ArrayList<DetalleOrden>();
@@ -135,7 +140,14 @@ public class HomeController {
 	}
 	
 	@GetMapping("/order")
-	public String order() {
+	public String order(Model model) {
+		
+		Usuario u=usuarioService.findById(1).get(); 
+		
+		model.addAttribute("cart", detalles);
+		model.addAttribute("orden", orden);
+		model.addAttribute("usuario", u);
+		
 		return "/usuario/resumenorden";
 	}
 
