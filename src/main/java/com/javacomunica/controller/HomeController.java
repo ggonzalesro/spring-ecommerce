@@ -1,6 +1,7 @@
 package com.javacomunica.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,8 @@ import com.javacomunica.model.DetalleOrden;
 import com.javacomunica.model.Orden;
 import com.javacomunica.model.Producto;
 import com.javacomunica.model.Usuario;
+import com.javacomunica.service.IDetalleOrdenService;
+import com.javacomunica.service.IOrdenService;
 import com.javacomunica.service.ProductoService;
 import com.javacomunica.service.UsuarioService;
 
@@ -35,6 +38,12 @@ public class HomeController {
 	
 	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Autowired
+	private IOrdenService ordenService;
+	
+	@Autowired
+	private IDetalleOrdenService detalleOrdenService;
 
 	// esto sirve para almacenar 1 o más detalles de la ORDEN
 	List<DetalleOrden> detalles = new ArrayList<DetalleOrden>();
@@ -151,4 +160,31 @@ public class HomeController {
 		return "/usuario/resumenorden";
 	}
 
+	@GetMapping("/saveOrder")
+	public String saveOrder() {
+		Date fechaCreacion=new Date();
+		
+		//datos de la orden
+		orden.setFechaCreacion(fechaCreacion);
+		orden.setNumero(ordenService.generarNumeroOrden());
+		
+		//usuario o cliente
+		Usuario u=usuarioService.findById(1).get();
+		orden.setUsuario(u);
+		ordenService.save(orden);
+		
+		//guardar los detalles
+		for (DetalleOrden detalleOrden : detalles) {
+			detalleOrden.setOrden(orden);
+			detalleOrdenService.save(detalleOrden);
+		}
+		
+		//limpiar o resetear los valores
+		orden = new Orden();
+		detalles.clear();
+		
+		return "redirect:/";
+	}
+	
+	
 }
