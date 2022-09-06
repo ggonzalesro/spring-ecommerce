@@ -3,6 +3,8 @@ package com.javacomunica.controller;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,7 @@ import com.javacomunica.model.Producto;
 import com.javacomunica.model.Usuario;
 import com.javacomunica.service.ProductoService;
 import com.javacomunica.service.UploadFileService;
+import com.javacomunica.service.UsuarioService;
 
 @Controller
 @RequestMapping("/productos")
@@ -30,6 +33,9 @@ public class ProductoController {
 	
 	@Autowired
 	private UploadFileService uploadFileService;
+	
+	@Autowired
+	private UsuarioService usuarioService;
 	
 	
 	@GetMapping("")
@@ -44,9 +50,10 @@ public class ProductoController {
 	}
 	
 	@PostMapping("/save")
-	public String save(Producto producto,@RequestParam("img") MultipartFile file) throws IOException {
+	public String save(Producto producto,@RequestParam("img") MultipartFile file,HttpSession session) throws IOException {
 		LOGGER.info("Este es el objeto {}",producto);
-		Usuario usuario = new Usuario(1, "", "", "", "", "", "", "");
+		Usuario usuario=usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
+		//Usuario usuario = new Usuario(1, "", "", "", "", "", "", "");
 		producto.setUsuario(usuario);
 		//image
 				if (producto.getId()==null) {
